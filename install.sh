@@ -7,6 +7,12 @@ echo "======================================"
 
 # Detect OS
 detect_os() {
+    # Check for Termux (Android)
+    if [ -d "/data/data/com.termux/files" ] || [ -n "$TERMUX_VERSION" ]; then
+        echo "termux"
+        return
+    fi
+    
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         case "$ID" in
@@ -60,6 +66,11 @@ install_deps() {
         suse)
             echo "Installing for openSUSE..."
             sudo zypper install -y ffmpeg python3-devel ncurses-devel cargo
+            ;;
+        termux)
+            echo "Installing for Termux (Android)..."
+            pkg update
+            pkg install -y python ffmpeg libiconv rust clang
             ;;
         *)
             echo "Unknown OS. Trying to install with pip and cargo..."
